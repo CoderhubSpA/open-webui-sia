@@ -24,20 +24,13 @@ ARG GID=0
 FROM --platform=$BUILDPLATFORM node:22-alpine3.20 AS build
 ARG BUILD_HASH
 
-# Configurar NODE_OPTIONS para aumentar la memoria disponible
-ENV NODE_OPTIONS="--max-old-space-size=8192"
-
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-# Limpiar caché e instalar dependencias
-RUN npm cache clean --force && \
-    npm ci --no-audit --no-fund
+RUN npm ci
 
 COPY . .
 ENV APP_BUILD_HASH=${BUILD_HASH}
-# Dividir el proceso de construcción
-RUN npm run pyodide:fetch
 RUN npm run build
 
 ######## WebUI backend ########
